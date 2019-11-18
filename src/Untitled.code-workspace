@@ -1,0 +1,39 @@
+{
+    "folders": [
+		{
+			"name": "esp32-wifiExample",
+			"path": "/Users/ebbevang/Documents/PlatformIO/Projects/esp32-wifiExample"
+		},
+		{
+			"name": "helloWorld",
+			"path": "/Users/ebbevang/Documents/PlatformIO/Projects/helloWorld"
+		},
+		{
+			"name": "oop example",
+			"path": "/Users/ebbevang/Documents/PlatformIO/Projects/oop example"
+		},
+		{
+			"name": "ESP32-DroneController",
+			"path": "/Users/ebbevang/Documents/PlatformIO/Projects/ESP32-DroneController"
+		},
+		{
+			"name": "esp32-splitString",
+			"path": "/Users/ebbevang/Documents/PlatformIO/Projects/esp32-splitString"
+		}
+	],
+    "settings": {
+        "files.associations": {
+            "functional": "cpp",
+            "array": "cpp",
+            "*.tcc": "cpp",
+            "deque": "cpp",
+            "string": "cpp",
+            "unordered_map": "cpp",
+            "unordered_set": "cpp",
+            "vector": "cpp",
+            "memory": "cpp",
+            "random": "cpp",
+            "initializer_list": "cpp"
+        }
+    }
+}

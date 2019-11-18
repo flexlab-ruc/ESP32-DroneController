@@ -24,12 +24,14 @@ class Drone : public ButtonListener
         Joystick *joystick;
     private:
         void commandResponse(String response);
+        void stateReceiver(String state);
         String ssid;
         String password;
-        AsyncUDP udp;
-        WiFiUDP udpSender;
-        const int udpPort = 8889; 
-        String droneIp = "192.168.1.146";
+        AsyncUDP udpCommand;
+        AsyncUDP udpState;
+        const int udpPortState = 8890;
+        const int udpPortCommand = 8889; 
+        String droneIp = "192.168.10.1";
         bool flying = false;
 };
 

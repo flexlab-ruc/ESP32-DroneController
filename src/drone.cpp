@@ -11,7 +11,7 @@ Drone::Drone(String ssid, String password)
 
 void Drone::connect()
 {
-    Serial.println("drone begin");
+    Serial.println("Connecting to drone...");
     //Serial.begin(9600);
     WiFi.mode(WIFI_STA);
     WiFi.begin(this->ssid.c_str(), this->password.c_str());
@@ -21,30 +21,44 @@ void Drone::connect()
             delay(1000);
         }
     }
-    if(udp.listen(udpPort)) {
-        this->myIp = WiFi.localIP().toString();
+
+    Serial.println("Connected!");
+
+    // listen for state information from drone
+    if(udpState.listen(udpPortState)) {
         Serial.print("UDP Listening on IP: ");
         Serial.println(WiFi.localIP());
-      
-        udp.onPacket(
-            [this](AsyncUDPPacket packet) -> void
-            {
-                // make a string from the data
+        udpState.onPacket([](AsyncUDPPacket packet) {
+            Serial.print("state: ");
+            Serial.write(packet.data(), packet.length());
+        });
+    }
+
+    // listen for command reply from drone
+    if(udpCommand.listen(udpPortCommand)) {
+        Serial.print("UDP Listening on IP: ");
+        Serial.println(WiFi.localIP());
+        udpCommand.onPacket([this](AsyncUDPPacket packet) {
+            // make a string from the data
                 String s((char*)packet.data());
                 s = s.substring(0, packet.length()); 
                 s.trim();
                 // send string to method
                 this->commandResponse(s);
-            }
-        );
+
+        });
     }
+
+    IPAddress ipOther = IPAddress(192,168,10,1);
+    udpCommand.connect(ipOther, udpPortCommand);
+
+    String reply = "command";
+    udpCommand.print(reply.c_str());
 }
 
 void Drone::sendCommand(String command)
 {
-    udpSender.beginPacket(this->droneIp.c_str(), udpPort);
-    udpSender.printf(command.c_str());
-    udpSender.endPacket();    
+    udpCommand.print(command.c_str());   
 }
 
 void Drone::setIp(String ip)
@@ -58,6 +72,12 @@ void Drone::commandResponse(String response)
     Serial.println(response.c_str());
     Serial.print("message length: ");
     Serial.println(response.length());
+}
+
+void stateReceiver(String state)
+{
+    Serial.print("got following state: ");
+    Serial.println(state.c_str());
 }
 
 void Drone::ButtonPressed()
@@ -94,12 +114,12 @@ void Drone::loop()
     }
     
     
-    /*
+    
     // Using joystick methods
     Serial.print(this->joystick->getX());
     Serial.print(" ");
     Serial.println(this->joystick->getY());
-    */
+    
     
     //sendmessage("joystickPosition")
 

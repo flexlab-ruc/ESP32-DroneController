@@ -3,8 +3,8 @@
 #include <drone.h>
 #include <joystick.h>
 
-String ssid = "flexlab2";
-String password = "flexiwifi";
+String ssid = "TELLO-FE3074";
+String password = "";
 
 Drone drone(ssid, password);
 Joystick joystick(15, 34, 35); // pins: btn, x, y
@@ -24,7 +24,7 @@ void setup()
   joystick.addButtonListener(&drone);
   
   drone.connect();
-  drone.setIp ("192.168.1.146");
+  //drone.setIp ("192.168.1.146");
 
   
 }
