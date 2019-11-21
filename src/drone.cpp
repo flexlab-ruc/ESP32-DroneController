@@ -2,6 +2,7 @@
 #include <drone.h>
 #include <joystick.h>
 #include <Position.h>
+#include <vector>
 
 Drone::Drone(String ssid, String password)
 {
@@ -28,9 +29,14 @@ void Drone::connect()
     if(udpState.listen(udpPortState)) {
         Serial.print("UDP Listening on IP: ");
         Serial.println(WiFi.localIP());
-        udpState.onPacket([](AsyncUDPPacket packet) {
-            Serial.print("state: ");
-            Serial.write(packet.data(), packet.length());
+        udpState.onPacket([this](AsyncUDPPacket packet) {
+            //Serial.print("state: ");
+            //Serial.write(packet.data(), packet.length());
+             String s((char*)packet.data());
+            s = s.substring(0, packet.length()); 
+            s.trim();
+            // send string to method
+            this->stateReceiver(s);
         });
     }
 
@@ -74,11 +80,40 @@ void Drone::commandResponse(String response)
     Serial.println(response.length());
 }
 
-void stateReceiver(String state)
+void Drone::stateReceiver(String state)
 {
-    Serial.print("got following state: ");
-    Serial.println(state.c_str());
+    this->fillStateArray(state);
+    
 }
+
+void Drone::fillStateArray(String state)
+{
+        //Serial.println("received following state: "+ state);
+        
+        int colon = 0; 
+        int semicolon = 0;
+
+        while (state.indexOf(':') != -1) // while there are colons left in state
+        {
+            colon = state.indexOf(':');
+            semicolon = state.indexOf(';');
+            
+            this->state[state.substring(0,colon)] = state.substring(colon+1, semicolon).toDouble();
+
+            //Serial.print(state.substring(0,colon));
+            //Serial.print(" : ");
+            //Serial.println(state.substring(colon+1, semicolon).toDouble());
+            //Serial.println(state.length());
+            
+            state = state.substring(semicolon+1);
+        }
+            
+
+            
+    
+
+}
+
 
 void Drone::ButtonPressed()
 {
@@ -107,18 +142,25 @@ void Drone::loop()
     {
         if (joystickPosition.y != 0)
         {
-        Serial.print(joystickPosition.x);
-        Serial.print(" ");
-        Serial.println(joystickPosition.y);
+        //Serial.print(joystickPosition.x);
+        //Serial.print(" ");
+        //Serial.println(joystickPosition.y);
         }
     }
     
-    
+    Serial.print("Battery : ");
+    Serial.print(this->state["bat"]);
+    Serial.print("\tBarometer : ");
+    Serial.print(this->state["baro"]);
+    Serial.print("agz : ");
+    Serial.print(this->state["agz"]);
+    Serial.println(); 
+
     
     // Using joystick methods
-    Serial.print(this->joystick->getX());
-    Serial.print(" ");
-    Serial.println(this->joystick->getY());
+    //Serial.print(this->joystick->getX());
+    //Serial.print(" ");
+    //Serial.println(this->joystick->getY());
     
     
     //sendmessage("joystickPosition")
